@@ -1,10 +1,13 @@
 import numpy as np
 from scipy.integrate import odeint
 from icecream import ic
+import matplotlib.pyplot as plt
 
 from typing import Optional
 from typing import Union
 from typing import List
+from typing import Tuple
+
 
 def build_hamiltonian(
         time: float,
@@ -14,7 +17,7 @@ def build_hamiltonian(
         g_2: float,
 ) -> np.ndarary:
     h_0 = energy + 1 + g_1 / g_2 * np.cos(omega * time)
-    h_1 = 1 + g_1 / g_2 np.cos(omega * time)
+    h_1 = 1 + g_1 / g_2 * np.cos(omega * time)
     return np.array([
         [   0,   0,  h_1],
         [   0,   0, -h_0],
@@ -37,16 +40,21 @@ def system(
 
 
 def plot_poincare_disk(
-        fig: plt.Figure,
-        ax: Union[plt.Axes, np.ndarray],
+        ax: plt.Axes,
         k_0: np.ndarray,
         k_1: np.ndarray,
         k_2: np.ndarray,
-) -> Tuple[
-    plt.Figure,
-    Union[plt.Axes, np.ndarray]
-]:
-    pass
+) -> plt.Axes:
+    tan_theta = - k_2 / k_1
+    theta = np.arctan(tan_theta)
+
+    k2 = k_1 * k_1 + k_2 * k_2
+    z_mag = (-1 + np.sqrt(1 + 4 * k2)) / np.sqrt(k2)
+    ax.scatter(
+        z_mag * np.cos(theta),
+        z_mag * np.sin(theta),
+    )
+    return ax
 
 
 def solve_system(
@@ -63,7 +71,7 @@ def solve_system(
     time_step = 1 / (20 * omega)
     if start_time is None:
         start_time = 0
-    time_steps = np.arange(start_time, stop_time, temp_step)
+    time_steps = np.arange(start_time, stop_time, time_step)
 
     if isinstance(energys, list) or isinstance(energys, np.NDArray):
         solns = [
