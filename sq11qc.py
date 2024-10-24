@@ -49,7 +49,12 @@ def plot_poincare_disk(
     theta = np.arctan(tan_theta)
 
     k2 = k_1 * k_1 + k_2 * k_2
-    z_mag = (-1 + np.sqrt(1 + 4 * k2)) / np.sqrt(k2)
+    k = np.sqrt(k2)
+    mask = np.isclose(k, 0)
+    umask = np.logical_not(mask)
+    z_mag = np.zeros_like(k)
+    z_mag[mask] = k[mask] - (k * k2)[mask] + 2 * (k * k2 ** 2)[mask]
+    z_mag[umask] = (-1 + np.sqrt(1 + 4 * k2[umask])) / (2 * k[umask])
     ax.scatter(
         z_mag * np.cos(theta),
         z_mag * np.sin(theta),
