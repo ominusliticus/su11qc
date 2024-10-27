@@ -34,7 +34,13 @@ def system(
         g_2: float,
 ) -> np.ndarray:
     return np.matmul(
-        build_hamiltonian,
+        build_hamiltonian(
+            time,
+            energy,
+            omega,
+            g_1,
+            g_2
+        ),
         X
     )
 
